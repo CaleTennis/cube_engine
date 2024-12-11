@@ -22,6 +22,4 @@ namespace Config {
 	static constexpr char GLSL_VERSION[] = "#version 330";
 	static constexpr char DEFAULT_VERTEX_SHADER_PATH[] = "shaders/defaultVertexShader.glsl";
 	static constexpr char DEFAULT_FRAGMENT_SHADER_PATH[] = "shaders/defaultFragmentShader.glsl";
-
-
 }

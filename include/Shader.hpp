@@ -15,6 +15,7 @@ class Shader {
 public:
 	Shader();
 	~Shader();
+	std::optional<EngineError> Init();
 	std::optional<EngineError> Init(const std::string& vertexPath, const std::string& fragmentPath);
 	std::optional<EngineError> Use();
 	std::optional<GLuint> GetId();

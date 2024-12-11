@@ -10,8 +10,8 @@
 		- Raytracing(???)
 		- The sky is the limit
 ### Todo:
-	- Replace remaining file paths with std::filesystem checks
-	- Add keyboard manipulations to rotate the scene and move around the editor
+	- Create .obj file parser
+	- Add keyboard manipulations to rotate the camera around scene and move around the editor
 	- Improve shader control/scalability
 ## Documentation:
 ### Overview
@@ -21,8 +21,10 @@
 		2. UIManager	 - Responsible for most ImGui features and input processing
 		3. Renderer		 - Responsible for most OpenGL/GLFW rendering done in the window
 #### Other Classes
-	- Shader: responible for loading in shaders from provided .glsl files
+	- Shader: responible for loading in shaders from .glsl files and creating shader programs from them
 	- Config: contains default parameters and program settings
+	- RawModel: Contains VAO and Vertex information for a model
+	- VertexObjectLoader: Generates VAOs and VBOs from a vertex array and returns a RawModel
 ### Style Guidelines:
 	- Class names should begin with a capital letter and use CamelCase
 	- Public class methods should begin with a capital letter and use CamelCase

@@ -6,19 +6,19 @@ Shader::Shader() :
 	m_lastError(EngineError::EE_OK)
 {};
 
+std::optional<EngineError> Shader::Init()
+{
+	return Shader::Init("", "");
+}
+
 std::optional<EngineError> Shader::Init(const std::string& vertexPath, const std::string& fragmentPath)
 {
 	std::optional<GLuint> vertexShader = loadShader(vertexPath, GL_VERTEX_SHADER);
-	if (!vertexShader.has_value())
-	{
-		return m_lastError;
-	}
+	VALCHECK(vertexShader, m_lastError);
 
 	std::optional<GLuint> fragmentShader = loadShader(fragmentPath, GL_FRAGMENT_SHADER);
-	if (!fragmentShader.has_value())
-	{
-		return m_lastError;
-	}
+	VALCHECK(fragmentShader, m_lastError);
+
 	m_programID = glCreateProgram();
 	glAttachShader(m_programID, vertexShader.value());
 	glAttachShader(m_programID, fragmentShader.value());
@@ -54,11 +54,7 @@ Shader::~Shader()
 
 std::optional<EngineError> Shader::Use()
 {
-	if (!m_currentShaderValid)
-	{
-		m_lastError = EngineError::EE_SHADER_USE_BEFORE_INIT;
-		return m_lastError;
-	}
+	ASSERT_TRUE(m_currentShaderValid, EngineError::EE_SHADER_USE_BEFORE_INIT);
 	
 	glUseProgram(m_programID);
 	return std::nullopt;

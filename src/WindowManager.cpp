@@ -18,13 +18,8 @@ WindowManager::~WindowManager()
 std::optional<EngineError> WindowManager::Init()
 {
 	// Initialize GLFW
-	if (!glfwInit())
-	{
-		std::cerr << "ERROR::GLFW::INIT::INITIALIZATION_FAILED" << std::endl;
-		m_lastError = EngineError::EE_GLFW_INIT_FAILED;
-		return m_lastError;
-	}
-
+	ASSERT_TRUE_M(glfwInit(), EngineError::EE_GLFW_INIT_FAILED, "ERROR::GLFW::INIT::INITIALIZATION_FAILED");
+	
 	// Give GLFW guidance for window creation
 	// GLFW Version 3.30
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -44,12 +39,7 @@ std::optional<EngineError> WindowManager::Init()
 		NULL,
 		NULL);
 
-	if (!m_window)
-	{
-		std::cerr << "ERROR::GLFW::WINDOW::CREATION_FAILED" << std::endl;
-		m_lastError = EngineError::EE_GLFW_WINDOW_CREATION_FAILED;
-		return m_lastError;
-	}
+	PTRCHECK_M(m_window, EngineError::EE_GLFW_WINDOW_CREATION_FAILED, "ERROR::GLFW::WINDOW::CREATION_FAILED");
 
 	if (Config::CENTER_WINDOW_ON_START && !Config::MAXIMIZE_WINDOW_ON_START)
 	{
@@ -61,13 +51,10 @@ std::optional<EngineError> WindowManager::Init()
 	glfwMakeContextCurrent(m_window);
 
 	// Initialize GLAD
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-	{
-		std::cerr << "ERROR::GLAD::INITIALIZATION_FAILED\n" << std::endl;
-		glfwTerminate();
-		m_lastError = EngineError::EE_GLAD_INIT_FAILED;
-		return m_lastError;
-	}
+	ASSERT_TRUE_M(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress),
+		EngineError::EE_GLAD_INIT_FAILED,
+		"ERROR::GLAD::INITIALIZATION_FAILED");
+	
 
 	enableReportGlErrors();
 

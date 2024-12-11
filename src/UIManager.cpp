@@ -28,21 +28,12 @@ std::optional<EngineError> UIManager::Init(GLFWwindow *window)
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     m_currentContext = ImGui::CreateContext();
-    if (!m_currentContext)
-    {
-        std::cerr << "ERROR::UIMANAGER::INIT::IMGUI_CREATE_CONTEXT_FAILED" << std::endl;
-        m_lastError = EngineError::EE_IMGUI_CREATE_CONTEXT_FAILED;
-        return m_lastError;
-    }
+    PTRCHECK_M(m_currentContext, EngineError::EE_IMGUI_CREATE_CONTEXT_FAILED, "ERROR::UIMANAGER::INIT::IMGUI_CREATE_CONTEXT_FAILED");
+   
     // Setup Dear ImGui IO config
     m_currentIO = &ImGui::GetIO(); (void)m_currentIO;
-    if (!m_currentContext)
-    {
-        std::cerr << "ERROR::UIMANAGER::INIT::IMGUI_GET_IO_FAILED" << std::endl;
-        m_lastError = EngineError::EE_IMGUI_GET_IO_FAILED;
-        return m_lastError;
-    }
-
+    PTRCHECK_M(m_currentIO, EngineError::EE_IMGUI_GET_IO_FAILED, "ERROR::UIMANAGER::INIT::IMGUI_GET_IO_FAILED");
+ 
     m_currentIO->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     m_currentIO->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
     m_currentIO->ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
@@ -51,12 +42,7 @@ std::optional<EngineError> UIManager::Init(GLFWwindow *window)
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
     m_style = &ImGui::GetStyle();
-    if (!m_style)
-    {
-        std::cerr << "ERROR::UIMANAGER::INIT::IMGUI_GET_STYLE_FAILED" << std::endl;
-        m_lastError = EngineError::EE_IMGUI_GET_STYLE_FAILED;
-        return m_lastError;
-    }
+    PTRCHECK_M(m_style, EngineError::EE_IMGUI_GET_STYLE_FAILED, "ERROR::UIMANAGER::INIT::IMGUI_GET_STYLE_FAILED");
 
     // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
     if(m_currentIO->ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
@@ -77,12 +63,7 @@ std::optional<EngineError> UIManager::Init(GLFWwindow *window)
 
     // Window related setup
     m_window = window;
-    if (!m_window)
-    {
-        std::cerr << "ERROR::UIMANAGER::INIT::INVALID_WINDOW_PROVIDED" << std::endl;
-        m_lastError = EngineError::EE_UIMANAGER_INIT_INVALID_WINDOW_PROVIDED;
-        return m_lastError;
-    }
+    PTRCHECK_M(m_window, EngineError::EE_UIMANAGER_INIT_INVALID_WINDOW_PROVIDED, "ERROR::UIMANAGER::INIT::INVALID_WINDOW_PROVIDED");
 
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -170,4 +151,8 @@ void UIManager::showEngineAboutWindow()
     ImGui::End();
     ImGui::PopStyleVar();
 }
-EngineError UIManager::GetLastError() noexcept { return m_lastError; }
+
+EngineError UIManager::GetLastError() noexcept 
+{ 
+    return m_lastError; 
+}

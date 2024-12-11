@@ -9,38 +9,23 @@ Engine::Engine() :
 	m_uiManager(UIManager()),
 	m_renderer(Renderer())
 {
-	Init();
+	if(Init().has_value())
+		glfwTerminate();
 }
 
 std::optional<EngineError> Engine::Init()
 {
-	if (m_windowManager.Init().has_value())
-	{
-		m_lastError = m_windowManager.GetLastError();
-		return m_lastError;
-	};
+	EECHECK(m_windowManager, Init())
 
 	std::optional<GLFWwindow*> window = m_windowManager.GetWindow();
 
-	if (window.has_value() && m_uiManager.Init(window.value()).has_value())
-	{
-		m_lastError = m_uiManager.GetLastError();
-		return m_lastError;
-	}
-	else if(!window.has_value())
-	{
-		m_lastError = EngineError::EE_WINDOW_MANAGER_INIT_BUT_NO_WINDOW;
-		return m_lastError;
-	}
-
-	if (window.has_value() && m_renderer.Init(window.value()).has_value())
-	{
-		m_lastError = m_uiManager.GetLastError();
-		return m_lastError;
-	}
+	VALCHECK(window, EngineError::EE_WINDOW_MANAGER_INIT_BUT_NO_WINDOW);
+	EECHECK(m_uiManager, Init(window.value()));
+	
+	EECHECK(m_renderer, Init(window.value()));
 
 	m_lastError = EngineError::EE_OK;
-	std::cout << "Engine::Init successfully completed" << std::endl;
+	std::cout << "Engine initialization successfully completed." << std::endl;
 	return std::nullopt;
 }
 
@@ -48,14 +33,14 @@ std::optional<EngineError> Engine::Run()
 {
 	while (m_windowManager.GetWindowShouldClose().has_value() && (m_windowManager.GetWindowShouldClose().value() == false))
 	{
-		if(m_windowManager.PollAndClear().has_value()) return m_windowManager.GetLastError();
-		if(m_uiManager.ProcessInput().has_value()) return m_uiManager.GetLastError();
-		if(m_renderer.Update().has_value()) return m_renderer.GetLastError();
+		EECHECK(m_windowManager, PollAndClear());
+		EECHECK(m_uiManager, ProcessInput());
+		EECHECK(m_renderer, Update());
 
-		if(m_uiManager.BuildUI().has_value()) return m_uiManager.GetLastError();
-		if(m_renderer.Render().has_value()) return m_renderer.GetLastError();
-		if(m_windowManager.Render()) return m_windowManager.GetLastError();
-		if(m_uiManager.UpdateAndRenderPlatformWindows().has_value()) return m_uiManager.GetLastError();
+		EECHECK(m_uiManager, BuildUI());
+		EECHECK(m_renderer, Render());
+		EECHECK(m_windowManager, Render());
+		EECHECK(m_uiManager, UpdateAndRenderPlatformWindows());
 	}
 	return std::nullopt;
 }
@@ -71,7 +56,7 @@ int Engine::GetExitResult() noexcept
 {
 	if (m_lastError == EngineError::EE_OK)
 	{
-		std::cout << "Engine exited successfully" << std::endl;
+		std::cout << "Engine exited successfully." << std::endl;
 		return 0;
 	}
 	else
